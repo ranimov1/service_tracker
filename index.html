@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline';">
     <title>نظام متابعة الخدمات</title>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" onerror="alert('Failed to load XLSX library')"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -218,7 +217,7 @@
                         <option value="عمر مسيكه">عمر مسيكه</option>
                         <option value="عبدالله مواس">عبدالله مواس</option>
                     </select>
-                    <button id="addIdentifierBtn">إضافة معرف جديد</button>
+                    <button type="button" id="addIdentifierBtn">إضافة معرف جديد</button>
                 </div>
                 <div class="form-group">
                     <label for="serviceDate">تاريخ الخدمة</label>
@@ -226,12 +225,12 @@
                 </div>
             </div>
             
-            <button id="addBtn">إضافة خدمة</button>
+            <button type="button" id="addBtn">إضافة خدمة</button>
         </div>
 
         <div class="action-buttons">
-            <button id="exportBtn" class="export-btn">تحميل ملف Excel</button>
-            <button id="clearBtn" class="clear-btn">مسح البيانات</button>
+            <button type="button" id="exportBtn" class="export-btn">تحميل ملف Excel</button>
+            <button type="button" id="clearBtn" class="clear-btn">مسح البيانات</button>
         </div>
         
         <table id="servicesTable">
@@ -261,13 +260,8 @@
     <script>
         const services = [];
 
-        function initializeApp() {
+        document.addEventListener('DOMContentLoaded', function() {
             const addBtn = document.getElementById('addBtn');
-            if (!addBtn) {
-                setTimeout(initializeApp, 100);
-                return;
-            }
-
             const exportBtn = document.getElementById('exportBtn');
             const clearBtn = document.getElementById('clearBtn');
             const addIdentifierBtn = document.getElementById('addIdentifierBtn');
@@ -276,8 +270,7 @@
             const identifierSelect = document.getElementById('identifier');
             
             // Add new identifier
-            addIdentifierBtn.addEventListener('click', function(e) {
-                e.preventDefault();
+            addIdentifierBtn.addEventListener('click', function() {
                 const newIdentifier = prompt('أدخل المعرف الجديد:');
                 if (newIdentifier) {
                     const option = document.createElement('option');
@@ -288,8 +281,7 @@
             });
 
             // Add new service
-            addBtn.addEventListener('click', function(e) {
-                e.preventDefault();
+            addBtn.addEventListener('click', function() {
                 const fullName = document.getElementById('fullName').value;
                 const address = document.getElementById('address').value;
                 const phone = document.getElementById('phone').value;
@@ -362,7 +354,7 @@
                         <td>${service.identifier}</td>
                         <td>${formatDate(service.serviceDate)}</td>
                         <td>
-                            <button onclick="deleteService(${index})" style="background-color: #f44336; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">حذف</button>
+                            <button type="button" onclick="deleteService(${index})" style="background-color: #f44336; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">حذف</button>
                         </td>
                     `;
                     
@@ -384,7 +376,7 @@
             function formatDate(dateString) {
                 const date = new Date(dateString);
                 const day = String(date.getDate()).padStart(2, '0');
-                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
                 const year = date.getFullYear();
                 return `${day}/${month}/${year}`;
             }
@@ -417,6 +409,8 @@
 
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, 'الخدمات');
+
+                // Download the Excel file
                 XLSX.writeFile(wb, 'الخدمات.xlsx');
             });
 
@@ -427,53 +421,15 @@
                     updateTable();
                 }
             });
-        }
-
-        document.addEventListener('DOMContentLoaded', initializeApp);
-        
-        // Global function for deleting services
-        function deleteService(index) {
-            if (confirm('هل أنت متأكد أنك تريد حذف هذه الخدمة؟')) {
-                services.splice(index, 1);
-                document.getElementById('servicesBody').innerHTML = '';
-                
-                // Re-render the table
-                services.forEach((service, i) => {
-                    const row = document.createElement('tr');
-                    if (service.serviceStatus === 'done') row.classList.add('done');
-                    if (service.serviceStatus === 'inprogress') row.classList.add('inprogress');
-                    if (service.serviceStatus === 'rejected') row.classList.add('rejected');
-                    
-                    row.innerHTML = `
-                        <td>${service.fullName}</td>
-                        <td>${service.address}</td>
-                        <td>${service.phone}</td>
-                        <td>${service.recordNumber}</td>
-                        <td>${service.gender}</td>
-                        <td>${service.maritalStatus}</td>
-                        <td>${service.childrenCount}</td>
-                        <td>${service.serviceType}</td>
-                        <td>$${service.amountPaid}</td>
-                        <td>${service.serviceStatus === 'done' ? 'تمت' : service.serviceStatus === 'inprogress' ? 'قيد التنفيذ' : 'مرفوضة'}</td>
-                        <td>${service.identifier}</td>
-                        <td>${formatDate(service.serviceDate)}</td>
-                        <td>
-                            <button onclick="deleteService(${i})" style="background-color: #f44336; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">حذف</button>
-                        </td>
-                    `;
-                    document.getElementById('servicesBody').appendChild(row);
-                });
-            }
-        }
-
-        // Global date formatting function
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
-        }
+            
+            // Delete service function (needs to be global)
+            window.deleteService = function(index) {
+                if (confirm('هل أنت متأكد أنك تريد حذف هذه الخدمة؟')) {
+                    services.splice(index, 1);
+                    updateTable();
+                }
+            };
+        });
     </script>
 </body>
 </html>
