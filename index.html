@@ -226,6 +226,7 @@
             </div>
             
             <button type="button" id="addBtn">إضافة خدمة</button>
+            <button type="button" id="saveBtn">حفظ الخدمات</button> <!-- Save Button -->
         </div>
 
         <div class="action-buttons">
@@ -264,6 +265,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const addBtn = document.getElementById('addBtn');
+            const saveBtn = document.getElementById('saveBtn'); // Save button
             const exportBtn = document.getElementById('exportBtn');
             const clearBtn = document.getElementById('clearBtn');
             const addIdentifierBtn = document.getElementById('addIdentifierBtn');
@@ -324,10 +326,15 @@
                 };
 
                 services.push(service);
-                localStorage.setItem('services', JSON.stringify(services)); // Save to localStorage
-                console.log("Saved services to localStorage:", services); // Debugging log
                 updateTable();
                 form.reset();
+            });
+
+            // Save services to localStorage
+            saveBtn.addEventListener('click', function() {
+                localStorage.setItem('services', JSON.stringify(services)); // Save to localStorage
+                console.log("Saved services to localStorage:", services); // Debugging log
+                alert('تم حفظ الخدمات بنجاح!');
             });
 
             // Update table with services
@@ -423,4 +430,23 @@
 
             // Clear all data
             clearBtn.addEventListener('click', function() {
-                if (confirm('
+                if (confirm('هل أنت متأكد أنك تريد مسح جميع البيانات؟')) {
+                    services.length = 0;
+                    localStorage.removeItem('services'); // Clear from localStorage
+                    console.log("Cleared services from localStorage."); // Debugging log
+                    updateTable();
+                }
+            });
+            
+            // Delete service function (needs to be global)
+            window.deleteService = function(index) {
+                if (confirm('هل أنت متأكد أنك تريد حذف هذه الخدمة؟')) {
+                    services.splice(index, 1);
+                    console.log("Updated services after deletion:", services); // Debugging log
+                    updateTable();
+                }
+            };
+        });
+    </script>
+</body>
+</html>
