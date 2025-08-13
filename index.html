@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام متابعة الخدمات</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            overflow-x: auto;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .done {
+            background-color: #a5d6a7 !important;
+        }
+        .inprogress {
+            background-color: #fff59d !important;
+        }
+        .rejected {
+            background-color: #ffab91 !important;
+        }
+        .form-container {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .export-btn {
+            background-color: #2196F3;
+        }
+        .export-btn:hover {
+            background-color: #0b7dda;
+        }
+        .clear-btn {
+            background-color: #f44336;
+        }
+        .clear-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>نظام متابعة الخدمات</h1>
+        
+        <div class="form-container">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fullName">الإسم الثلاثي</label>
+                    <input type="text" id="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">العنوان</label>
+                    <input type="text" id="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">رقم الهاتف</label>
+                    <input type="number" id="phone" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="recordNumber">رقم السجل</label>
+                    <input type="text" id="recordNumber" required>
+                </div>
+                <div class="form-group">
+                    <label for="gender">الجنس</label>
+                    <select id="gender" required>
+                        <option value="">اختر</option>
+                        <option value="ذكر">ذكر</option>
+                        <option value="أنثى">أنثى</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="maritalStatus">الوضع العائلي</label>
+                    <select id="maritalStatus" required>
+                        <option value="">اختر</option>
+                        <option value="أعزب">أعزب</option>
+                        <option value="متزوج">متزوج</option>
+                        <option value="مطلق">مطلق</option>
+                        <option value="أرمل">أرمل</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="childrenCount">عدد الأولاد</label>
+                    <select id="childrenCount" required>
+                        <option value="">اختر</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="serviceType">نوع الخدمة</label>
+                    <select id="serviceType" required>
+                        <option value="">اختر</option>
+                        <option value="صحي">صحي</option>
+                        <option value="إجتماعي">إجتماعي</option>
+                        <option value="تربوي">تربوي</option>
+                        <option value="أمني">أمني</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="amountPaid">القيمة المدفوعة ($)</label>
+                    <input type="number" id="amountPaid" step="0.01" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="serviceStatus">حالة الخدمة</label>
+                    <select id="serviceStatus" required>
+                        <option value="">اختر</option>
+                        <option value="done">تمت</option>
+                        <option value="inprogress">قيد التنفيذ</option>
+                        <option value="rejected">مرفوضة</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="identifier">المعرف</label>
+                    <select id="identifier" required>
+                        <option value="">اختر</option>
+                        <option value="محمد خربطلي">محمد خربطلي</option>
+                        <option value="محمد بنكلش">محمد بنكلش</option>
+                        <option value="علي العلي">علي العلي</option>
+                        <option value="عمر مسيكه">عمر مسيكه</option>
+                        <option value="عبدالله مواس">عبدالله مواس</option>
+                    </select>
+                    <button id="addIdentifierBtn">إضافة معرف جديد</button>
+                </div>
+                <div class="form-group">
+                    <label for="serviceDate">تاريخ الخدمة</label>
+                    <input type="date" id="serviceDate" required>
+                </div>
+            </div>
+            
+            <button id="addBtn">إضافة خدمة</button>
+        </div>
+        
+        <div class="action-buttons">
+            <button id="exportBtn" class="export-btn">تحميل ملف Excel</button>
+            <button id="clearBtn" class="clear-btn">مسح البيانات</button>
+        </div>
+        
+        <table id="servicesTable">
+            <thead>
+                <tr>
+                    <th>الإسم الثلاثي</th>
+                    <th>العنوان</th>
+                    <th>رقم الهاتف</th>
+                    <th>رقم السجل</th>
+                    <th>الجنس</th>
+                    <th>الوضع العائلي</th>
+                    <th>عدد الأولاد</th>
+                    <th>نوع الخدمة</th>
+                    <th>القيمة المدفوعة ($)</th>
+                    <th>حالة الخدمة</th>
+                    <th>المعرف</th>
+                    <th>تاريخ الخدمة</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="servicesBody">
+                <!-- Dynamic content will be added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Check if the user is logged in
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html'; // Redirect to login page if not logged in
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const services = [];
+            const addBtn = document.getElementById('addBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const addIdentifierBtn = document.getElementById('addIdentifierBtn');
+            const form = document.querySelector('.form-container');
+            const tableBody = document.getElementById('servicesBody');
+            const identifierSelect = document.getElementById('identifier');
+            
+            // Add new identifier
+            addIdentifierBtn.addEventListener('click', function() {
+                const newIdentifier = prompt('أدخل المعرف الجديد:');
+                if (newIdentifier) {
+                    const option = document.createElement('option');
+                    option.value = newIdentifier;
+                    option.textContent = newIdentifier;
+                    identifierSelect.appendChild(option);
+                }
+            });
+
+            // Add new service
+            addBtn.addEventListener('click', function() {
+                const fullName = document.getElementById('fullName').value;
+                const address = document.getElementById('address').value;
+                const phone = document.getElementById('phone').value;
+                const recordNumber = document.getElementById('recordNumber').value;
+                const gender = document.getElementById('gender').value;
+                const maritalStatus = document.getElementById('maritalStatus').value;
+                const childrenCount = document.getElementById('childrenCount').value;
+                const serviceType = document.getElementById('serviceType').value;
+                const amountPaid = document.getElementById('amountPaid').value;
+                const serviceStatus = document.getElementById('serviceStatus').value;
+                const identifier = document.getElementById('identifier').value;
+                const serviceDate = document.getElementById('serviceDate').value;
+                
+                // Validate all fields
+                if (!fullName || !address || !phone || !recordNumber || !gender || !maritalStatus || 
+                    !childrenCount || !serviceType || !amountPaid || !serviceStatus || !identifier || !serviceDate) {
+                    alert('يرجى ملء جميع الحقول المطلوبة');
+                    return;
+                }
+                
+                // Create service object
+                const service = {
+                    fullName,
+                    address,
+                    phone,
+                    recordNumber,
+                    gender,
+                    maritalStatus,
+                    childrenCount,
+                    serviceType,
+                    amountPaid,
+                    serviceStatus,
+                    identifier,
+                    serviceDate
+                };
+                
+                services.push(service);
+                updateTable();
+                form.reset();
+            });
+            
+            // Update table with services
+            function updateTable() {
+                tableBody.innerHTML = '';
+                
+                services.forEach((service, index) => {
+                    const row = document.createElement('tr');
+                    
+                    // Apply status-based styling
+                    if (service.serviceStatus === 'done') {
+                        row.classList.add('done');
+                    } else if (service.serviceStatus === 'inprogress') {
+                        row.classList.add('inprogress');
+                    } else if (service.serviceStatus === 'rejected') {
+                        row.classList.add('rejected');
+                    }
+                    
+                    // Create cells
+                    row.innerHTML = `
+                        <td>${service.fullName}</td>
+                        <td>${service.address}</td>
+                        <td>${service.phone}</td>
+                        <td>${service.recordNumber}</td>
+                        <td>${service.gender}</td>
+                        <td>${service.maritalStatus}</td>
+                        <td>${service.childrenCount}</td>
+                        <td>${service.serviceType}</td>
+                        <td>$${service.amountPaid}</td>
+                        <td>${getStatusText(service.serviceStatus)}</td>
+                        <td>${service.identifier}</td>
+                        <td>${formatDate(service.serviceDate)}</td>
+                        <td>
+                            <button onclick="deleteService(${index})" style="background-color: #f44336; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">حذف</button>
+                        </td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+            }
+            
+            // Helper function to get status text
+            function getStatusText(status) {
+                switch(status) {
+                    case 'done': return 'تمت';
+                    case 'inprogress': return 'قيد التنفيذ';
+                    case 'rejected': return 'مرفوضة';
+                    default: return status;
+                }
+            }
+            
+            // Helper function to format date
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('ar-SA');
+            }
+            
+            // Export to Excel (XLSX)
+            exportBtn.addEventListener('click', function() {
+                if (services.length === 0) {
+                    alert('لا توجد بيانات للتصدير');
+                    return;
+                }
+                
+                // Prepare data for Excel
+                const data = services.map(service => [
+                    service.fullName,
+                    service.address,
+                    service.phone,
+                    service.recordNumber,
+                    service.gender,
+                    service.maritalStatus,
+                    service.childrenCount,
+                    service.serviceType,
+                    service.amountPaid,
+                    getStatusText(service.serviceStatus),
+                    service.identifier,
+                    formatDate(service.serviceDate)
+                ]);
+                
+                // Create worksheet
+                const ws = XLSX.utils.aoa_to_sheet([
+                    [
+                        'الإسم الثلاثي', 'العنوان', 'رقم الهاتف', 'رقم السجل', 'الجنس', 
+                        'الوضع العائلي', 'عدد الأولاد', 'نوع الخدمة', 'القيمة المدفوعة ($)', 
+                        'ح
