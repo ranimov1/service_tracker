@@ -258,7 +258,7 @@
     </div>
 
     <script>
-        const services = [];
+        const services = JSON.parse(localStorage.getItem('services')) || [];
 
         document.addEventListener('DOMContentLoaded', function() {
             const addBtn = document.getElementById('addBtn');
@@ -269,6 +269,9 @@
             const tableBody = document.getElementById('servicesBody');
             const identifierSelect = document.getElementById('identifier');
             
+            // Load services from localStorage
+            updateTable();
+
             // Add new identifier
             addIdentifierBtn.addEventListener('click', function() {
                 const newIdentifier = prompt('أدخل المعرف الجديد:');
@@ -319,6 +322,7 @@
                 };
 
                 services.push(service);
+                localStorage.setItem('services', JSON.stringify(services)); // Save to localStorage
                 updateTable();
                 form.reset();
             });
@@ -418,6 +422,7 @@
             clearBtn.addEventListener('click', function() {
                 if (confirm('هل أنت متأكد أنك تريد مسح جميع البيانات؟')) {
                     services.length = 0;
+                    localStorage.removeItem('services'); // Clear from localStorage
                     updateTable();
                 }
             });
@@ -426,6 +431,7 @@
             window.deleteService = function(index) {
                 if (confirm('هل أنت متأكد أنك تريد حذف هذه الخدمة؟')) {
                     services.splice(index, 1);
+                    localStorage.setItem('services', JSON.stringify(services)); // Update localStorage
                     updateTable();
                 }
             };
