@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام متابعة الخدمات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         body {
@@ -116,6 +117,13 @@
         .clear-btn:hover {
             background-color: #d32f2f;
         }
+        .icon-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #333;
+            font-size: 20px;
+        }
     </style>
 </head>
 <body>
@@ -226,7 +234,6 @@
             </div>
             
             <button type="button" id="addBtn">إضافة خدمة</button>
-            <button type="button" id="saveBtn">حفظ الخدمات</button> <!-- Save Button -->
         </div>
 
         <div class="action-buttons">
@@ -265,7 +272,6 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const addBtn = document.getElementById('addBtn');
-            const saveBtn = document.getElementById('saveBtn'); // Save button
             const exportBtn = document.getElementById('exportBtn');
             const clearBtn = document.getElementById('clearBtn');
             const addIdentifierBtn = document.getElementById('addIdentifierBtn');
@@ -326,15 +332,10 @@
                 };
 
                 services.push(service);
-                updateTable();
-                form.reset();
-            });
-
-            // Save services to localStorage
-            saveBtn.addEventListener('click', function() {
                 localStorage.setItem('services', JSON.stringify(services)); // Save to localStorage
                 console.log("Saved services to localStorage:", services); // Debugging log
-                alert('تم حفظ الخدمات بنجاح!');
+                updateTable();
+                form.reset();
             });
 
             // Update table with services
@@ -368,7 +369,9 @@
                         <td>${service.identifier}</td>
                         <td>${formatDate(service.serviceDate)}</td>
                         <td>
-                            <button type="button" onclick="deleteService(${index})" style="background-color: #f44336; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">حذف</button>
+                            <button type="button" class="icon-button" onclick="deleteService(${index})">
+                                <i class="fas fa-trash" title="حذف"></i>
+                            </button>
                         </td>
                     `;
                     
@@ -442,6 +445,7 @@
             window.deleteService = function(index) {
                 if (confirm('هل أنت متأكد أنك تريد حذف هذه الخدمة؟')) {
                     services.splice(index, 1);
+                    localStorage.setItem('services', JSON.stringify(services)); // Update localStorage
                     console.log("Updated services after deletion:", services); // Debugging log
                     updateTable();
                 }
